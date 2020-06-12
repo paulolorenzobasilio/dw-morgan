@@ -12,14 +12,14 @@ class CovidObservationController extends Controller
         $covidObservations =  DB::table('covid_observations')
             ->select(
                 [
-                    'observation_date', 'country_region', DB::raw('SUM(confirmed) as confirmed'),
+                    'observation_date', 'country', DB::raw('SUM(confirmed) as confirmed'),
                     DB::raw('SUM(deaths) as deaths'), DB::raw('SUM(recovered) as recovered')
                 ]
             )
             ->when(request('observation_date', false), function ($q, $observationDate) {
                 return $q->whereObservationDate($observationDate);
             })
-            ->groupBy(['observation_date', 'country_region'])
+            ->groupBy(['observation_date', 'country'])
             ->orderByDesc(DB::raw('SUM(confirmed)'))
             ->limit(request('max_results', 15))
             ->get();

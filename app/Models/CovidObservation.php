@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CovidObservation extends Model
 {
     protected $fillable = [
-        'id', 'observation_date', 'province_state', 'country_region',
+        'id', 'observation_date', 'province_state', 'country',
         'confirmed', 'deaths', 'recovered', 'last_update'
     ];
 

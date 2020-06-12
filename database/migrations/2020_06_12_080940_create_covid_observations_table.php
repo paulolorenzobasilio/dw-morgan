@@ -17,7 +17,7 @@ class CreateCovidObservationsTable extends Migration
             $table->id();
             $table->date('observation_date');
             $table->string('province_state')->nullable();
-            $table->string('country_region');
+            $table->string('country');
             $table->integer('confirmed');
             $table->integer('deaths');
             $table->integer('recovered');
@@ -32,6 +32,6 @@ class CreateCovidObservationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('covid_observtions');
+        Schema::dropIfExists('covid_observations');
     }
 }

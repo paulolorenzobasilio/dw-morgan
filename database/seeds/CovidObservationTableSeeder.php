@@ -26,7 +26,7 @@ class CovidObservationTableSeeder extends Seeder
                 'id' => $record['SNo'],
                 'observation_date' => $record['ObservationDate'],
                 'province_state' => $record['Province/State'],
-                'country_region' => $record['Country/Region'],
+                'country' => $record['Country/Region'],
                 'last_update' => $record['Last Update'],
                 'confirmed' => (int) $record['Confirmed'],
                 'deaths' => (int) $record['Deaths'],
