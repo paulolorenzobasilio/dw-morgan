@@ -23,8 +23,39 @@ class CovidObservationController extends Controller
             ->orderByDesc(DB::raw('SUM(confirmed)'))
             ->limit(request('max_results', 15))
             ->get();
-
+        
         return $this->groupBy('observation_date', $covidObservations);
+
+        /**
+         * TODO: How to serialize this
+         * {
+         * "2020-01-22": [
+         *      {
+         *          "country_region": "Mainland China",
+         *          "confirmed": 547,
+         *          "deaths": 17,
+         *          "recovered: 28
+         *      }
+         *  ]
+         * }
+         * 
+         * into this..
+         * 
+         * {
+         * "observation_date": "2020-01-22"
+         * "countries": [
+         *      {
+         *          "country": "Mainland China",
+         *          "confirmed": 15
+         *          "deaths": 2,
+         *          "recovered": 7
+         *      },
+         *      {
+         *          ...
+         *      }
+         *  ]
+         * }
+         */
     }
 
 
