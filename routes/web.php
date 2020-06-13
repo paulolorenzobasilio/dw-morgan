@@ -12,5 +12,8 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+$router->get('/', function(){
+    return 'Paulo Lorenzo M. Basilio';
+});
 
 $router->get('/top/confirmed', 'CovidObservationController');
