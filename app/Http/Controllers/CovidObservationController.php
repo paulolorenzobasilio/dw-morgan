@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class CovidObservationController extends Controller
@@ -21,53 +20,53 @@ class CovidObservationController extends Controller
             })
             ->groupBy(['observation_date', 'country'])
             ->orderByDesc(DB::raw('SUM(confirmed)'))
-            ->limit(request('max_results', 15))
+            ->limit(request()->query('max_results', 15))
             ->get();
-        
-        return $this->groupBy('observation_date', $covidObservations);
 
-        /**
-         * TODO: How to serialize this
-         * {
-         * "2020-01-22": [
-         *      {
-         *          "country_region": "Mainland China",
-         *          "confirmed": 547,
-         *          "deaths": 17,
-         *          "recovered: 28
-         *      }
-         *  ]
-         * }
-         * 
-         * into this..
-         * 
-         * {
-         * "observation_date": "2020-01-22"
-         * "countries": [
-         *      {
-         *          "country": "Mainland China",
-         *          "confirmed": 15
-         *          "deaths": 2,
-         *          "recovered": 7
-         *      },
-         *      {
-         *          ...
-         *      }
-         *  ]
-         * }
-         */
-    }
-
-
-    private function groupBy(string $key, Collection $data): array
-    {
-        $result = [];
-        foreach ($data as $val) {
-            $temp = clone $val;
-            unset($temp->$key);
-            $result[$val->$key][] = $temp;
+        if (request('observation_date', false)) {
+            return $this->buildSingleResult($covidObservations);
         }
 
-        return $result;
+        return $this->buildMultipleResult($covidObservations);
+    }
+
+    /**
+     * Construct the structure by
+     * {
+     * observation_date: "2020-01-22"
+     * countries: [...]
+     * }
+     */
+    private function buildSingleResult($data)
+    {
+        foreach ($data as $val) {
+            $results["observation_date"] = $val->observation_date;
+            unset($val->observation_date);
+            $results["countries"][] = $val;
+        }
+        return $results;
+    }
+
+    /**
+     * Construct the structure by multiple set
+     * {
+     *      [
+     *          observation_date: "2020-01-22"
+     *          countries: [...]
+     *      ]
+     *      [
+     *          observation_date: "2020-01-23"
+     *          countries: [...]
+     *      ]
+     * }
+     */
+    private function buildMultipleResult($data)
+    {
+        $results = [];
+        $data = $data->groupBy('observation_date');
+        foreach ($data as $key => $val) {
+            $results [] = $this->buildSingleResult($val);
+        }
+        return $results;
     }
 }
