@@ -8,7 +8,7 @@
 - Postgres
 
 ### Installing
-1. git clone https://github.com/paulolorenzobasilio/events.git
+1. git clone https://github.com/paulolorenzobasilio/dw-morgan.git
 2. cd into project dir
 3. cp .env.example .env
 4. configure your .env environment 
