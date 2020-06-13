@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\CovidObservation;
-use Illuminate\Support\Facades\DB;
 
 class CovidObservationController extends Controller
 {
@@ -16,17 +15,12 @@ class CovidObservationController extends Controller
 
     public function __invoke()
     {
-        $covidObservations =  $this->covidObservation->select([
-            'observation_date', 'country', DB::raw('SUM(confirmed) as confirmed'),
-            DB::raw('SUM(deaths) as deaths'), DB::raw('SUM(recovered) as recovered')
-        ])->when(request('observation_date', false), function ($q, $observationDate) {
-            return $q->whereObservationDate($observationDate);
-        })->groupBy(['observation_date', 'country'])
-            ->orderByDesc(DB::raw('SUM(confirmed)'))
-            ->limit(request()->query('max_results', 15))
-            ->get();
+        $observationDate = request()->query('observation_date', false);
+        $maxResults = request()->query('max_results', 15);
 
-        if (request('observation_date', false)) {
+        $covidObservations = $this->covidObservation->topConfirmed($observationDate, $maxResults);
+
+        if ($observationDate) {
             return $this->buildSingleResultSet($covidObservations);
         }
 
@@ -40,7 +34,7 @@ class CovidObservationController extends Controller
      *      countries: [...]
      * }
      */
-    private function buildSingleResultSet($data)
+    private function buildSingleResultSet($data): array
     {
         $results = [];
         foreach ($data as $val) {
@@ -61,7 +55,7 @@ class CovidObservationController extends Controller
      *      [...]
      * }
      */
-    private function buildMultipleResultSet($data)
+    private function buildMultipleResultSet($data): array
     {
         $results = [];
         $data = $data->groupBy('observation_date');
